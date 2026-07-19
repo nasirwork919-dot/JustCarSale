@@ -1,0 +1,73 @@
+import "express-async-errors";
+import express, { NextFunction, Request, Response } from "express";
+import cors from "cors";
+import authRoutes from "./routes/authRoutes";
+import vehicleRoutes from "./routes/vehicleRoutes";
+import businessRoutes from "./routes/businessRoutes";
+import reviewRoutes from "./routes/reviewRoutes";
+import bookingRoutes from "./routes/bookingRoutes";
+import marketplaceRoutes from "./routes/marketplaceRoutes";
+import auctionRoutes from "./routes/auctionRoutes";
+import transportRoutes from "./routes/transportRoutes";
+import vinRoutes from "./routes/vinRoutes";
+import inspectionRoutes from "./routes/inspectionRoutes";
+import insuranceRoutes from "./routes/insuranceRoutes";
+import transferRoutes from "./routes/transferRoutes";
+import stolenReportRoutes from "./routes/stolenReportRoutes";
+import messageRoutes from "./routes/messageRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
+import sparePartRoutes from "./routes/sparePartRoutes";
+import documentRoutes from "./routes/documentRoutes";
+import dashboardRoutes from "./routes/dashboardRoutes";
+import adminRoutes from "./routes/adminRoutes";
+import searchRoutes from "./routes/searchRoutes";
+import photoSyncRoutes from "./routes/photoSyncRoutes";
+
+export const app = express();
+
+app.use(cors());
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ limit: "20mb", extended: true }));
+
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok" });
+});
+app.get("/api/backend-health", (_req, res) => {
+  res.json({ status: "ok", service: "backend" });
+});
+
+app.use("/api/auth", authRoutes);
+app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/businesses", businessRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/marketplace", marketplaceRoutes);
+app.use("/api/auctions", auctionRoutes);
+app.use("/api/transport", transportRoutes);
+app.use("/api/vin", vinRoutes);
+app.use("/api/inspections", inspectionRoutes);
+app.use("/api/insurance", insuranceRoutes);
+app.use("/api/transfers", transferRoutes);
+app.use("/api/stolen-reports", stolenReportRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/spare-parts", sparePartRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/photo-sync", photoSyncRoutes);
+
+app.use((_req, res) => {
+  res.status(404).json({ success: false, error: "Not found" });
+});
+
+// Final error handler. Combined with the express-async-errors import above,
+// this catches rejected promises from any async route handler — without it,
+// an unhandled rejection just leaves the request hanging until the platform's
+// timeout instead of returning a clean response.
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  console.error("[backend] Unhandled error:", err);
+  if (res.headersSent) return;
+  res.status(500).json({ success: false, error: "Internal server error" });
+});

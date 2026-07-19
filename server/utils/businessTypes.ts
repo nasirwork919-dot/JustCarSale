@@ -1,0 +1,14 @@
+export const BUSINESS_TYPES = [
+  "DEALER",
+  "WORKSHOP",
+  "TIRE_SHOP",
+  "DRIVING_SCHOOL",
+  "RENTAL",
+  "DISMANTLER",
+  "LAWYER",
+  "PAINTER",
+  "GLASS_REPAIR",
+  "METALWORK",
+  "WRAPPING",
+  "DETAILING",
+] as const;
