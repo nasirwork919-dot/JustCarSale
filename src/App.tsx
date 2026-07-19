@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
   Car, Shield, Search, UserCheck, MessageSquare, Briefcase, Menu, X, Landmark, Globe, Activity, ChevronDown,
   Linkedin, Instagram, Twitter, Youtube, Facebook, Tag, Wrench, Gavel, Paintbrush, Disc, Sparkles, Layers,
@@ -275,6 +275,23 @@ export default function App() {
       setGlobalVinSearch('');
     }
   };
+
+  // Stable references — ServicesPage depends on this in a useEffect, so a
+  // fresh inline function on every App render would re-fire that effect
+  // every render, which calls back into this state, re-rendering App and
+  // producing a new inline function again: an infinite render/animation
+  // flicker loop. useCallback breaks that cycle.
+  const handleServiceCategoryChange = useCallback((cat: string | null) => {
+    setActiveServiceCategory(cat);
+    setHeaderServicesCategory(cat);
+  }, []);
+
+  const handleSelectService = useCallback((serviceId: string) => {
+    setServiceSourcePage('services');
+    setSelectedServiceId(serviceId);
+    setCurrentPage('service-details');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   const handleHeaderSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1093,18 +1110,10 @@ export default function App() {
               className="w-full"
             >
               <ServicesPage
-                onSelectService={(serviceId) => {
-                  setServiceSourcePage('services');
-                  setSelectedServiceId(serviceId);
-                  setCurrentPage('service-details');
-                  window.scrollTo({ top: 0, behavior: 'instant' });
-                }}
+                onSelectService={handleSelectService}
                 initialCategory={headerServicesCategory}
                 initialSearchQuery={headerServicesSearchQuery}
-                onCategoryChange={(cat) => {
-                  setActiveServiceCategory(cat);
-                  setHeaderServicesCategory(cat);
-                }}
+                onCategoryChange={handleServiceCategoryChange}
               />
             </motion.div>
           )}
