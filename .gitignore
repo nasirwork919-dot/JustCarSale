@@ -7,3 +7,12 @@ coverage/
 .env*
 !.env.example
 server/generated/
+# Generated at build time by `npm run build:vercel-api` — the bundled
+# serverless function for Vercel, not source (api/package.json IS source
+# and must stay tracked — it forces this directory to be interpreted as
+# CommonJS despite the project root's "type": "module").
+api/index.js
+api/index.cjs
+
+.vercel
+.env*
