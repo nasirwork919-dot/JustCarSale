@@ -7,18 +7,20 @@ export async function stats(_req: Request, res: Response) {
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  const [totalActiveVehicles, totalDealers, countries, vehiclesThisWeek] = await Promise.all([
-    prisma.vehicle.count({ where: { status: "ACTIVE", deletedAt: null } }),
-    prisma.businessProfile.count({ where: { verified: true } }),
-    prisma.vehicle.findMany({
-      where: { status: "ACTIVE", deletedAt: null },
-      select: { country: true },
-      distinct: ["country"],
-    }),
-    prisma.vehicle.count({
-      where: { status: "ACTIVE", deletedAt: null, createdAt: { gte: weekAgo } },
-    }),
-  ]);
+  // Sequential, not Promise.all: with a serverless-safe connection_limit of a
+  // few connections per instance, firing 4 queries at once just makes them
+  // queue against each other on the same limited pool instead of actually
+  // running in parallel — sequential avoids that self-inflicted contention.
+  const totalActiveVehicles = await prisma.vehicle.count({ where: { status: "ACTIVE", deletedAt: null } });
+  const totalDealers = await prisma.businessProfile.count({ where: { verified: true } });
+  const countries = await prisma.vehicle.findMany({
+    where: { status: "ACTIVE", deletedAt: null },
+    select: { country: true },
+    distinct: ["country"],
+  });
+  const vehiclesThisWeek = await prisma.vehicle.count({
+    where: { status: "ACTIVE", deletedAt: null, createdAt: { gte: weekAgo } },
+  });
 
   ok(res, {
     totalActiveVehicles,
