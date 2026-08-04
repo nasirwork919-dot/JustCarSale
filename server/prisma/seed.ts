@@ -99,6 +99,15 @@ async function main() {
 
   const seller = users.find((u) => u.role === "PERSONAL")!;
 
+  const PHOTO_URLS = [
+    "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+    "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
+    "https://images.unsplash.com/photo-1494905998402-395d579af36f",
+    "https://images.unsplash.com/photo-1583121274602-3e2820c69888",
+    "https://images.unsplash.com/photo-1568605114967-8130f3a36994",
+    "https://images.unsplash.com/photo-1560958089-b8a1929cea89",
+  ];
+
   const vehicles = [];
   for (let i = 0; i < 20; i++) {
     const { make, model } = randomFrom(MAKES);
@@ -122,6 +131,13 @@ async function main() {
         condition: "USED",
         status: "ACTIVE",
         description: `Well-maintained ${make} ${model}, single owner, full service history.`,
+        photos: {
+          create: [0, 1, 2].map((idx) => ({
+            url: `${randomFrom(PHOTO_URLS)}?auto=format&fit=crop&w=1200&q=80&sig=base-${i}-${idx}`,
+            isPrimary: idx === 0,
+            order: idx,
+          })),
+        },
       },
     });
     vehicles.push(vehicle);
@@ -148,15 +164,6 @@ async function main() {
     });
   }
   console.log(`Seeded ${auctionCount} auctions`);
-
-  const PHOTO_URLS = [
-    "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-    "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-    "https://images.unsplash.com/photo-1494905998402-395d579af36f",
-    "https://images.unsplash.com/photo-1583121274602-3e2820c69888",
-    "https://images.unsplash.com/photo-1568605114967-8130f3a36994",
-    "https://images.unsplash.com/photo-1560958089-b8a1929cea89",
-  ];
 
   const businessSeller2 = users.find((u) => u.role === "WORKSHOP") ?? businessSeller;
 

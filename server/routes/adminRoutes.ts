@@ -16,4 +16,7 @@ router.get("/businesses", adminController.listBusinesses);
 router.patch("/businesses/:id/verify", adminController.verifyBusiness);
 router.patch("/businesses/:id/reject", adminController.rejectBusiness);
 
+// TEMPORARY — see adminController.backfillVehiclePhotos. Remove after running once.
+router.post("/backfill-vehicle-photos", adminController.backfillVehiclePhotos);
+
 export default router;
