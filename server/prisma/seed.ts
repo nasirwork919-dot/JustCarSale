@@ -3,17 +3,19 @@ import { prisma } from "../utils/prisma";
 
 const SALT_ROUNDS = 10;
 
+// One real, visually-verified photo per make/model (not a shared random pool)
+// so a vehicle's listing photo actually matches what it claims to be.
 const MAKES = [
-  { make: "Toyota", model: "Camry" },
-  { make: "Honda", model: "Civic" },
-  { make: "Ford", model: "F-150" },
-  { make: "BMW", model: "3 Series" },
-  { make: "Mercedes-Benz", model: "C-Class" },
-  { make: "Volkswagen", model: "Golf" },
-  { make: "Audi", model: "A4" },
-  { make: "Nissan", model: "Altima" },
-  { make: "Hyundai", model: "Elantra" },
-  { make: "Kia", model: "Sportage" },
+  { make: "Toyota", model: "Camry", photo: "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb" },
+  { make: "Honda", model: "Civic", photo: "https://images.unsplash.com/photo-1754502167978-356d08d53dd6" },
+  { make: "Ford", model: "F-150", photo: "https://images.unsplash.com/photo-1614218110929-caa460524fc1" },
+  { make: "BMW", model: "3 Series", photo: "https://images.unsplash.com/photo-1627867407010-8a5c65856346" },
+  { make: "Mercedes-Benz", model: "C-Class", photo: "https://images.unsplash.com/photo-1615228939096-9ead6c74008e" },
+  { make: "Volkswagen", model: "Golf", photo: "https://images.unsplash.com/photo-1760688964516-1012e0ece2a8" },
+  { make: "Audi", model: "A4", photo: "https://images.unsplash.com/photo-1540066019607-e5f69323a8dc" },
+  { make: "Nissan", model: "Altima", photo: "https://images.unsplash.com/photo-1551817280-6d59c77ce1b8" },
+  { make: "Hyundai", model: "Elantra", photo: "https://images.unsplash.com/photo-1645145214095-84fca73e0cc5" },
+  { make: "Kia", model: "Sportage", photo: "https://images.unsplash.com/photo-1688893287874-ac7fbd686c24" },
 ];
 
 const CITIES = [
@@ -99,17 +101,9 @@ async function main() {
 
   const seller = users.find((u) => u.role === "PERSONAL")!;
 
-  const PHOTO_URLS = [
-    "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-    "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-    "https://images.unsplash.com/photo-1494905998402-395d579af36f",
-    "https://images.unsplash.com/photo-1583121274602-3e2820c69888",
-    "https://images.unsplash.com/photo-1560958089-b8a1929cea89",
-  ];
-
   const vehicles = [];
   for (let i = 0; i < 20; i++) {
-    const { make, model } = randomFrom(MAKES);
+    const { make, model, photo } = randomFrom(MAKES);
     const { country, city } = randomFrom(CITIES);
     const vehicle = await prisma.vehicle.create({
       data: {
@@ -132,7 +126,7 @@ async function main() {
         description: `Well-maintained ${make} ${model}, single owner, full service history.`,
         photos: {
           create: [0, 1, 2].map((idx) => ({
-            url: `${randomFrom(PHOTO_URLS)}?auto=format&fit=crop&w=1200&q=80&sig=base-${i}-${idx}`,
+            url: `${photo}?auto=format&fit=crop&w=1200&q=80&sig=base-${i}-${idx}`,
             isPrimary: idx === 0,
             order: idx,
           })),
@@ -168,7 +162,7 @@ async function main() {
 
   const extraVehicles = [];
   for (let i = 0; i < 10; i++) {
-    const { make, model } = randomFrom(MAKES);
+    const { make, model, photo } = randomFrom(MAKES);
     const { country, city } = randomFrom(CITIES);
     const vehicle = await prisma.vehicle.create({
       data: {
@@ -191,7 +185,7 @@ async function main() {
         description: `Well-maintained ${make} ${model}, single owner, full service history.`,
         photos: {
           create: [0, 1, 2].map((idx) => ({
-            url: `${randomFrom(PHOTO_URLS)}?auto=format&fit=crop&w=1200&q=80&sig=${i}-${idx}`,
+            url: `${photo}?auto=format&fit=crop&w=1200&q=80&sig=extra-${i}-${idx}`,
             isPrimary: idx === 0,
             order: idx,
           })),

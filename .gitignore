@@ -4,10 +4,9 @@ dist/
 coverage/
 .DS_Store
 *.log
-.env*
 !.env.example
 server/generated/
 
 .vercel
 .claude/
-.env*
+config.bat
