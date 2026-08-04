@@ -961,8 +961,25 @@ export default function LandingPage({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {(featuredVehicles.length > 0 ? featuredVehicles : sampleVehicles).slice(0, 6).map((car, idx) => (
-              <motion.div 
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, idx) => (
+                <div
+                  key={`skeleton-${idx}`}
+                  className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden flex flex-col justify-between shadow-xs"
+                >
+                  <div className="h-44 w-full bg-slate-100 animate-pulse" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 w-3/4 bg-slate-100 rounded animate-pulse" />
+                    <div className="h-3 w-1/2 bg-slate-100 rounded animate-pulse" />
+                    <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
+                      <div className="h-4 w-16 bg-slate-100 rounded animate-pulse" />
+                      <div className="h-8 w-24 bg-slate-100 rounded-full animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (featuredVehicles.length > 0 ? featuredVehicles : sampleVehicles).slice(0, 6).map((car, idx) => (
+              <motion.div
                 key={car.vin}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={isSplashLoading ? undefined : { opacity: 1, y: 0 }}
