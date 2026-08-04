@@ -104,7 +104,6 @@ async function main() {
     "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
     "https://images.unsplash.com/photo-1494905998402-395d579af36f",
     "https://images.unsplash.com/photo-1583121274602-3e2820c69888",
-    "https://images.unsplash.com/photo-1568605114967-8130f3a36994",
     "https://images.unsplash.com/photo-1560958089-b8a1929cea89",
   ];
 
