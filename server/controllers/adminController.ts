@@ -191,39 +191,6 @@ export async function platformStats(_req: AuthenticatedRequest, res: Response) {
   });
 }
 
-// TEMPORARY one-off data fix — backfills photos onto any seeded vehicle that
-// has none (the seed script used to only attach photos to 10 of 30
-// vehicles, so photo-less ones all fell back to the same placeholder image
-// on the frontend). Remove this endpoint once run against production.
-const BACKFILL_PHOTO_URLS = [
-  "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-  "https://images.unsplash.com/photo-1494905998402-395d579af36f",
-  "https://images.unsplash.com/photo-1583121274602-3e2820c69888",
-  "https://images.unsplash.com/photo-1568605114967-8130f3a36994",
-  "https://images.unsplash.com/photo-1560958089-b8a1929cea89",
-];
-
-export async function backfillVehiclePhotos(_req: AuthenticatedRequest, res: Response) {
-  const vehiclesWithoutPhotos = await prisma.vehicle.findMany({
-    where: { photos: { none: {} } },
-    select: { id: true },
-  });
-
-  for (const [i, v] of vehiclesWithoutPhotos.entries()) {
-    await prisma.vehiclePhoto.createMany({
-      data: [0, 1, 2].map((idx) => ({
-        vehicleId: v.id,
-        url: `${BACKFILL_PHOTO_URLS[(i + idx) % BACKFILL_PHOTO_URLS.length]}?auto=format&fit=crop&w=1200&q=80&sig=backfill-${i}-${idx}`,
-        isPrimary: idx === 0,
-        order: idx,
-      })),
-    });
-  }
-
-  ok(res, { backfilled: vehiclesWithoutPhotos.length });
-}
-
 export async function flaggedOverview(_req: AuthenticatedRequest, res: Response) {
   const [flaggedVehicles, openStolenReports, openClaims] = await Promise.all([
     prisma.vehicle.findMany({

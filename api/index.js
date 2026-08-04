@@ -3602,31 +3602,6 @@ async function platformStats(_req, res) {
     vehiclesListedThisWeek
   });
 }
-var BACKFILL_PHOTO_URLS = [
-  "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-  "https://images.unsplash.com/photo-1494905998402-395d579af36f",
-  "https://images.unsplash.com/photo-1583121274602-3e2820c69888",
-  "https://images.unsplash.com/photo-1568605114967-8130f3a36994",
-  "https://images.unsplash.com/photo-1560958089-b8a1929cea89"
-];
-async function backfillVehiclePhotos(_req, res) {
-  const vehiclesWithoutPhotos = await prisma.vehicle.findMany({
-    where: { photos: { none: {} } },
-    select: { id: true }
-  });
-  for (const [i, v] of vehiclesWithoutPhotos.entries()) {
-    await prisma.vehiclePhoto.createMany({
-      data: [0, 1, 2].map((idx) => ({
-        vehicleId: v.id,
-        url: `${BACKFILL_PHOTO_URLS[(i + idx) % BACKFILL_PHOTO_URLS.length]}?auto=format&fit=crop&w=1200&q=80&sig=backfill-${i}-${idx}`,
-        isPrimary: idx === 0,
-        order: idx
-      }))
-    });
-  }
-  ok(res, { backfilled: vehiclesWithoutPhotos.length });
-}
 async function flaggedOverview(_req, res) {
   const [flaggedVehicles, openStolenReports, openClaims] = await Promise.all([
     prisma.vehicle.findMany({
@@ -3665,7 +3640,6 @@ router19.patch("/users/:id/ban", banUser);
 router19.get("/businesses", listBusinesses2);
 router19.patch("/businesses/:id/verify", verifyBusiness);
 router19.patch("/businesses/:id/reject", rejectBusiness);
-router19.post("/backfill-vehicle-photos", backfillVehiclePhotos);
 var adminRoutes_default = router19;
 
 // server/routes/searchRoutes.ts
